@@ -132,3 +132,7 @@
 .container {
   @apply max-w-6xl w-full mx-auto
 }
+
+.no-focus {
+  @apply focus-visible:ring-0 focus-visible:ring-transparent focus-visible:ring-offset-0;
+}
