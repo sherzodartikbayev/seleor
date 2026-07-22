@@ -94,7 +94,7 @@ const SignUpPage = () => {
             <div className='mt-4'>
                 <div className='text-sm text-muted-foreground'>
                     If you have an account{' '}
-                    <Button variant={'link'} className='cursor-pointer'>
+                    <Button variant={'link'}>
                         <Link href='/sign-in'>Sign in</Link>
                     </Button>
                 </div>

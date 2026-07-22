@@ -75,7 +75,7 @@ const SignInPage = () => {
             <div className='mt-4'>
                 <div className='text-sm text-muted-foreground'>
                     Don&apos;t have an account?{' '}
-                    <Button variant={'link'} className='cursor-pointer'>
+                    <Button variant={'link'}>
                         <Link href='/sign-up'>Sign up</Link>
                     </Button>
                 </div>
