@@ -1,4 +1,6 @@
+const orderModel = require("../models/order.model");
 const productModel = require("../models/product.model");
+const transactionModel = require("../models/transaction.model");
 const userModel = require("../models/user.model");
 
 class AdminController {
@@ -43,12 +45,66 @@ class AdminController {
         }
     }
 
+    // [GET] /customers
+    async getCustomers(req, res, next) {
+        try {
+            const userId = "6a60fb3285d431b959bc48e4"
+            const user = await userModel.findById(userId)
+            if (!user) return res.status(404).json({ message: "User not found" })
+            if (!user.role === "admin") return res.status(400).json({ message: "User is not admin" })
+
+            const customers = await userModel.find({ role: "user" })
+            if (!customers) return res.status(404).json({ message: "Customers not found" })
+
+            return res.status(200).json({ message: "Successfully get customers", customers })
+        } catch (error) {
+            console.log(error);
+            next(error)
+        }
+    }
+
+    // [GET] /orders
+    async getOrders(req, res, next) {
+        try {
+            const userId = "6a60fb3285d431b959bc48e4"
+            const user = await userModel.findById(userId)
+            if (!user) return res.status(404).json({ message: "User not found" })
+            if (!user.role === "admin") return res.status(400).json({ message: "User is not admin" })
+
+            const orders = await orderModel.find().lean()
+            if (!orders) return res.status(404).json({ message: "Orders not found" })
+
+            return res.status(200).json({ message: "Successfully get orders", orders })
+        } catch (error) {
+            console.log(error);
+            next(error)
+        }
+    }
+
+    // [GET] /admin/transactions
+    async getTransactions(req, res, next) {
+        try {
+            const userId = "6a60fb3285d431b959bc48e4"
+            const user = await userModel.findById(userId)
+            if (!user) return res.status(404).json({ message: "User not found" })
+            if (!user.role === "admin") return res.status(400).json({ message: "User is not admin" })
+
+            const transactions = await transactionModel.find().lean()
+            if (!transactions) return res.status(404).json({ message: "Orders not found" })
+
+            return res.status(200).json({ message: "Successfully get customers", transactions })
+        } catch (error) {
+            console.log(error)
+            next(error)
+        }
+    }
+
     // [POST] /product
     async createProduct(req, res, next) {
         try {
             const data = req.body
-            const userId = "6a60fb3285d431b959bc48e4"
 
+            const userId = "6a60fb3285d431b959bc48e4"
             const user = await userModel.findById(userId)
             if (!user) return res.status(404).json({ message: "User not found" })
             if (!user.role === "admin") return res.status(400).json({ message: "User is not admin" })
@@ -69,8 +125,8 @@ class AdminController {
         try {
             const data = req.body
             const { id } = req.params
-            const userId = "6a60fb3285d431b959bc48e4"
 
+            const userId = "6a60fb3285d431b959bc48e4"
             const user = await userModel.findById(userId)
             if (!user) return res.status(404).json({ message: "User not found" })
             if (!user.role === "admin") return res.status(400).json({ message: "User is not admin" })
@@ -85,10 +141,32 @@ class AdminController {
         }
     }
 
+    // [PUT] /order/:id
+    async updateOrder(req, res, next) {
+        try {
+            const { status } = req.body
+            const id = req.params
+
+            const userId = "6a60fb3285d431b959bc48e4"
+            const user = await userModel.findById(userId)
+            if (!user) return res.status(404).json({ message: "User not found" })
+            if (!user.role === "admin") return res.status(400).json({ message: "User is not admin" })
+
+            const updatedOrder = await orderModel.findByIdAndUpdate(id, { status })
+            if (!updatedOrder) return res.status(404).json({ message: "Order not found" })
+
+            return res.status(200).json({ message: "Order successfully updated", updatedOrder })
+        } catch (error) {
+            console.log(error);
+            next(error)
+        }
+    }
+
     // [DELETE] /product/:id
     async deleteProduct(req, res, next) {
         try {
             const { id } = req.params
+
             const userId = "6a60fb3285d431b959bc48e4"
             const user = await userModel.findById(userId)
             if (!user) return res.status(404).json({ message: "User not found" })
@@ -102,14 +180,6 @@ class AdminController {
             console.log(error)
             next(error)
         }
-    }
-
-    static async protectRoute(req, res, next) {
-        const userId = "6a60fb3285d431b959bc48e4"
-        const user = await userModel.findById(userId)
-        if (!user) return res.status(404).json({ message: "User not found" })
-        if (!user.role === "admin") return res.status(400).json({ message: "User is not admin" })
-        next()
     }
 }
 
