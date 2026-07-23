@@ -13,7 +13,6 @@ router.post('/product', adminController.createProduct)
 router.put('/product/:id', adminController.updateProduct)
 router.put('/order/:id', adminController.updateOrder)
 
-
 router.delete('/product/:id', adminController.deleteProduct)
 
 module.exports = router 
