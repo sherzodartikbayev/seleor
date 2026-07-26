@@ -7,17 +7,12 @@ class AdminController {
     // [GET] /products
     async getAllProducts(req, res, next) {
         try {
-            const userId = "6a60fb3285d431b959bc48e4"
-            const user = await userModel.findById(userId)
-            if (!user) return res.status(404).json({ failure: "User not found" })
-            if (!user.role === "admin") return res.status(400).json({ failure: "User is not admin" })
-
             const products = await productModel.find().lean()
             if (!products) {
                 return res.status(404).json({ failure: "Products not found" })
             }
 
-            return res.status(200).json(products)
+            return res.status(200).json({ products })
         } catch (error) {
             console.log(error);
             next(error)
@@ -102,16 +97,11 @@ class AdminController {
         try {
             const data = req.body
 
-            const userId = "6a60fb3285d431b959bc48e4"
-            const user = await userModel.findById(userId)
-            if (!user) return res.status(404).json({ failure: "User not found" })
-            if (!user.role === "admin") return res.status(400).json({ failure: "User is not admin" })
-
             const newProduct = await productModel.create(data)
 
             if (!newProduct) return res.status(400).json({ failure: "Failure while creating product" })
 
-            return res.status(200).json({ message: "Product successfully created" })
+            return res.status(201).json({ status: 201 })
         } catch (error) {
             console.log(error)
             next(error)

@@ -38,14 +38,14 @@ const ProductCard: FC<Props> = ({ product }) => {
                 <Badge className='absolute top-0 left-0'>{product.category}</Badge>
             </div>
 
-            <div className='p-2'>
+            <div className='p-2 space-y-2'>
                 <div className='flex justify-between items-center text-sm'>
                     <h1 className='font-bold'>{product.title}</h1>
                     <NoSSR>
                         <p className='font-medium'>{formatPrice(product.price!)}</p>
                     </NoSSR>
                 </div>
-                <p className='text-xs text-muted-foreground leading-1 line-clamp-5'>{product.description}</p>
+                <p className='text-xs text-muted-foreground leading-1 mb-5'>{product.description}</p>
                 <Separator className='my-2' />
             </div>
 
@@ -55,7 +55,7 @@ const ProductCard: FC<Props> = ({ product }) => {
                 </Button>
                 <AlertDialog>
                     <AlertDialogTrigger>
-                        <Button variant={'outline'}>Delete</Button>
+                        <Button variant='destructive' className='w-full'>Delete</Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                         <AlertDialogHeader>

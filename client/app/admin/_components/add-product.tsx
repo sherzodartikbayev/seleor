@@ -1,5 +1,6 @@
 'use client'
 
+import { createProduct, deleteFile } from '@/actions/admin.action'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -9,26 +10,54 @@ import { Separator } from '@/components/ui/separator'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { Textarea } from '@/components/ui/textarea'
 import { categories } from '@/constants'
+import useAction from '@/hooks/use-action'
 import { useProduct } from '@/hooks/use-product'
+import { UploadDropzone } from '@/lib/uploadthing'
 import { formatPrice } from '@/lib/utils'
 import { productSchema } from '@/lib/validation'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PlusCircle } from 'lucide-react'
+import { Loader2, PlusCircle, X } from 'lucide-react'
+import Image from 'next/image'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { z } from 'zod'
 
 const AddProduct = () => {
     const { open, setOpen } = useProduct()
+
+    const { isLoading, setIsLoading, onError } = useAction()
 
     const form = useForm<z.infer<typeof productSchema>>({
         resolver: zodResolver(productSchema),
         defaultValues: { title: '', description: '', category: '', price: '', image: '', imageKey: '' },
     })
 
-    async function onSubmit(values: z.infer<typeof productSchema>) { }
+    async function onSubmit(values: z.infer<typeof productSchema>) {
+        if (!form.watch('image')) return toast('Please upload an image')
+        setIsLoading(true)
+        const res = await createProduct(values)
+        if (res?.serverError || res?.validationErrors || !res?.data) {
+            return onError('Something went wrong')
+        }
+        if (res.data.failure) {
+            return onError(res.data.failure)
+        }
+        if (res.data.status === 201) {
+            toast('Product successfully created')
+            setIsLoading(false)
+            form.reset()
+            setOpen(false)
+        }
+    }
 
     function onOpen() {
         setOpen(true)
+    }
+
+    function onDelete() {
+        deleteFile(form.getValues('imageKey'))
+        form.setValue('image', '')
+        form.setValue('imageKey', '')
     }
 
     return (
@@ -38,22 +67,22 @@ const AddProduct = () => {
                 <PlusCircle />
             </Button>
             <Sheet open={open} onOpenChange={setOpen}>
-                <SheetContent>
+                <SheetContent className="overflow-auto">
                     <SheetHeader>
                         <SheetTitle>Manage your product</SheetTitle>
                         <SheetDescription>Field marked with * are required fields and must be filled.</SheetDescription>
                     </SheetHeader>
-                    <Separator className='my-3' />
+                    <Separator className="-my-5" />
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-2 p-5'>
                             <FormField
                                 control={form.control}
                                 name='title'
                                 render={({ field }) => (
-                                    <FormItem className='space-y-0'>
+                                    <FormItem>
                                         <Label className='text-xs'>Title</Label>
                                         <FormControl>
-                                            <Input placeholder='Adidas shoes' className='bg-secondary' {...field} />
+                                            <Input placeholder='Adidas shoes' className='bg-secondary' {...field} disabled={isLoading} />
                                         </FormControl>
                                         <FormMessage className='text-xs text-red-500' />
                                     </FormItem>
@@ -63,10 +92,10 @@ const AddProduct = () => {
                                 control={form.control}
                                 name='description'
                                 render={({ field }) => (
-                                    <FormItem className='space-y-0'>
+                                    <FormItem>
                                         <Label className='text-xs'>Description</Label>
                                         <FormControl>
-                                            <Textarea placeholder='Adidas shoes are the best shoes in the world' className='bg-secondary' {...field} />
+                                            <Textarea placeholder='Adidas shoes are the best shoes in the world' className='bg-secondary' {...field} disabled={isLoading} />
                                         </FormControl>
                                         <FormMessage className='text-xs text-red-500' />
                                     </FormItem>
@@ -76,9 +105,9 @@ const AddProduct = () => {
                                 control={form.control}
                                 name='category'
                                 render={({ field }) => (
-                                    <FormItem className='space-y-0'>
+                                    <FormItem>
                                         <Label className='text-xs'>Cateogry</Label>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLoading}>
                                             <FormControl>
                                                 <SelectTrigger className='bg-secondary'>
                                                     <SelectValue placeholder='Select category' />
@@ -100,24 +129,47 @@ const AddProduct = () => {
                                 control={form.control}
                                 name='price'
                                 render={({ field }) => (
-                                    <FormItem className='space-y-0'>
+                                    <FormItem>
                                         <Label className='text-xs'>
                                             {!form.watch('price') ? 'Price' : `Price ${formatPrice(Number(form.watch('price')))} `}
                                         </Label>
                                         <FormControl>
-                                            <Input placeholder='100.000 UZS' type='number' className='bg-secondary' {...field} />
+                                            <Input placeholder='100.000 UZS' type='number' className='bg-secondary' {...field} disabled={isLoading} />
                                         </FormControl>
                                         <FormMessage className='text-xs text-red-500' />
                                     </FormItem>
                                 )}
                             />
-                            <Button type='submit' className='w-full mt-1'>
-                                Submit
+
+                            <Label className='text-xs'>Image</Label>
+                            {form.watch('image') && (
+                                <div className="w-full h-50 bg-secondary flex justify-center items-center relative">
+                                    <Image src={form.watch('image')} alt="product image" fill className='object-cover' />
+                                    <Button type='button' size='icon' variant='destructive' className='absolute top-0 right-0 bg-destructive cursor-pointer' onClick={onDelete}>
+                                        <X className='text-white' />
+                                    </Button>
+                                </div>
+                            )}
+
+                            {!form.watch('image') && (
+                                <UploadDropzone
+                                    endpoint={'imageUploader'}
+                                    onClientUploadComplete={res => {
+                                        form.setValue('image', res[0].url)
+                                        form.setValue('imageKey', res[0].key)
+                                    }}
+                                    config={{ appendOnPaste: true, mode: 'auto' }}
+                                    appearance={{ container: { height: 200, padding: 10 } }}
+                                />
+                            )}
+
+                            <Button type='submit' className='w-full mt-1' disabled={isLoading}>
+                                Submit {isLoading && <Loader2 className='animate-spin' />}
                             </Button>
                         </form>
                     </Form>
                 </SheetContent>
-            </Sheet>
+            </Sheet >
         </>
     )
 }

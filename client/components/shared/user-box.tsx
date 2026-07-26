@@ -15,6 +15,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { signOut } from "next-auth/react"
 import { LogIn } from "lucide-react"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "../ui/alert-dialog"
+import Link from "next/link"
 
 interface Props {
     user: IUser
@@ -35,7 +36,14 @@ const UserBox: FC<Props> = ({ user }) => {
                 <DropdownMenuContent className="w-50">
                     <DropdownMenuGroup>
                         <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                        <DropdownMenuItem>Profile</DropdownMenuItem>
+                        {user.role === 'admin' && (
+                            <DropdownMenuItem className='cursor-pointer'>
+                                <Link href={'/admin'}>Admin</Link>
+                            </DropdownMenuItem>
+                        )}
+                        <DropdownMenuItem className='cursor-pointer'>
+                            <Link href={'/dashboard'}>Dashboard</Link>
+                        </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                             variant="destructive"
