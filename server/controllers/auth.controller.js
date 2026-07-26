@@ -7,12 +7,10 @@ class AuthController {
             const { email, password } = req.body
 
             const user = await userModel.findOne({ email })
-            if (!user) return res.status(404).json({ message: "User not found" })
+            if (!user) return res.status(404).json({ failure: "User not found" })
 
             const isValidPassword = await bcrypt.compare(password, user.password)
-            if (!isValidPassword) {
-                return res.status(400).json({ message: "Invalid password" })
-            }
+            if (!isValidPassword) return res.status(400).json({ failure: "Invalid password" })
 
             return res.json({ user })
         } catch (error) {
@@ -26,7 +24,7 @@ class AuthController {
             const { fullName, email, password } = req.body
 
             const user = await userModel.findOne({ email })
-            if (user) return res.status(400).json({ message: "User already exists" })
+            if (user) return res.status(400).json({ failure: "User already exists" })
 
             const hashedPassword = await bcrypt.hash(password, 10)
             const newUser = await userModel.create({

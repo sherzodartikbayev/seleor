@@ -9,7 +9,7 @@ class UserController {
     async getProducts(req, res, next) {
         try {
             const products = await productModel.find().lean()
-            if (!products) return res.status(404).json({ message: "Products not found" })
+            if (!products) return res.status(404).json({ failure: "Products not found" })
 
             return res.status(200).json({ message: "Products successfully get", products })
         } catch (error) {
@@ -24,7 +24,7 @@ class UserController {
             const { id } = req.params
 
             const product = await productModel.findById(id)
-            if (!product) return res.status(404).json({ message: "Product not found" })
+            if (!product) return res.status(404).json({ failure: "Product not found" })
 
             return res.status(200).json({ message: "Product successfully get", product })
         } catch (error) {
@@ -36,10 +36,10 @@ class UserController {
     // [GET] /profile/:id
     async getProfile(req, res, next) {
         try {
-            const profile = await userModel.findById(req.params.id)
-            if (!profile) return res.status(404).json({ message: "Profile not found" })
+            const user = await userModel.findById(req.params.id).select('-password')
+            if (!user) return res.status(404).json({ failure: "Profile not found" })
 
-            return res.status(200).json({ message: "Profile successfully get", profile })
+            return res.status(200).json({ message: "Profile successfully get", user })
         } catch (error) {
             console.log(error);
             next(error)
@@ -52,7 +52,7 @@ class UserController {
             const userId = '6a60fb3285d431b959bc48e4'
             const orders = await orderModel.find({ user: userId })
 
-            if (!orders) return res.status(404).json({ message: "Order not found" })
+            if (!orders) return res.status(404).json({ failure: "Order not found" })
 
             return res.status(200).json({ message: "Orders successfully get", orders })
         } catch (error) {
@@ -67,7 +67,7 @@ class UserController {
             const userId = '6a60fb3285d431b959bc48e4'
             const transactions = await transactionModel.find({ user: userId })
 
-            if (!transactions) return res.status(404).json({ message: "Transactions not found" })
+            if (!transactions) return res.status(404).json({ failure: "Transactions not found" })
 
             return res.status(200).json({ message: "Transactions succussfully get", transactions })
         } catch (error) {
@@ -82,7 +82,7 @@ class UserController {
             const userId = '6a60fb3285d431b959bc48e4'
             const user = await userModel.findById(userId).populate('favorites')
 
-            if (!user) return res.status(404).json({ message: "User not found" })
+            if (!user) return res.status(404).json({ failure: "User not found" })
 
             return res.status(200).json({
                 message: "Favorites successfully get",
@@ -100,7 +100,7 @@ class UserController {
             const userId = '6a60fb3285d431b959bc48e4'
             const user = await userModel.findById(userId)
 
-            if (!user) return res.status(404).json({ message: "User not found" })
+            if (!user) return res.status(404).json({ failure: "User not found" })
 
             const totalOrders = await orderModel.countDocuments({ user: user._id })
             const totalTransactions = await transactionModel.countDocuments({ user: user._id })
@@ -120,7 +120,7 @@ class UserController {
 
             const userId = '6a60fb3285d431b959bc48e4'
             const user = await userModel.findById(userId)
-            if (!user) return res.status(404).json({ message: "User not found" })
+            if (!user) return res.status(404).json({ failure: "User not found" })
             user.favorites.push(productId)
             await user.save()
 
@@ -136,7 +136,7 @@ class UserController {
         try {
             const userId = '6a60fb3285d431b959bc48e4'
             const user = await userModel.findById(userId)
-            if (!user) return res.status(404).json({ message: "User not found" })
+            if (!user) return res.status(404).json({ failure: "User not found" })
 
             user.set(req.body)
             await user.save()
@@ -153,13 +153,13 @@ class UserController {
         try {
             const { oldPassword, newPassword } = req.body
 
-            const userId = '6a60fb3285d431b959bc48e4'
+            const userId = '6a625fa38bc39639ad428a9f'
             const user = await userModel.findById(userId)
 
-            if (!user) return res.status(404).json({ message: "User not found" })
+            if (!user) return res.status(404).json({ failure: "User not found" })
 
             const isPasswordMatch = await bcrypt.compare(oldPassword, user.password)
-            if (!isPasswordMatch) return res.status(400).json({ message: 'Old password is incorrect' })
+            if (!isPasswordMatch) return res.status(400).json({ failure: 'Old password is incorrect' })
 
             const hashedPassword = await bcrypt.hash(newPassword, 10)
             await userModel.findByIdAndUpdate(userId, { password: hashedPassword })
@@ -178,7 +178,7 @@ class UserController {
 
             const userId = '6a60fb3285d431b959bc48e4'
             const user = await userModel.findById(userId)
-            if (!user) return res.status(404).json({ message: "User not found" })
+            if (!user) return res.status(404).json({ failure: "User not found" })
 
             user.favorites.pull(id)
             await user.save()

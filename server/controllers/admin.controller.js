@@ -9,12 +9,12 @@ class AdminController {
         try {
             const userId = "6a60fb3285d431b959bc48e4"
             const user = await userModel.findById(userId)
-            if (!user) return res.status(404).json({ message: "User not found" })
-            if (!user.role === "admin") return res.status(400).json({ message: "User is not admin" })
+            if (!user) return res.status(404).json({ failure: "User not found" })
+            if (!user.role === "admin") return res.status(400).json({ failure: "User is not admin" })
 
             const products = await productModel.find().lean()
             if (!products) {
-                return res.status(404).json({ message: "Products not found" })
+                return res.status(404).json({ failure: "Products not found" })
             }
 
             return res.status(200).json(products)
@@ -29,14 +29,12 @@ class AdminController {
         try {
             const userId = "6a60fb3285d431b959bc48e4"
             const user = await userModel.findById(userId)
-            if (!user) return res.status(404).json({ message: "User not found" })
-            if (!user.role === "admin") return res.status(400).json({ message: "User is not admin" })
+            if (!user) return res.status(404).json({ failure: "User not found" })
+            if (!user.role === "admin") return res.status(400).json({ failure: "User is not admin" })
 
             const { id } = req.params
             const product = await productModel.findById(id)
-            if (!product) {
-                return res.status(404).json({ message: "Product not found" })
-            }
+            if (!product) return res.status(404).json({ failure: "Product not found" })
 
             return res.status(200).json(product)
         } catch (error) {
@@ -50,11 +48,11 @@ class AdminController {
         try {
             const userId = "6a60fb3285d431b959bc48e4"
             const user = await userModel.findById(userId)
-            if (!user) return res.status(404).json({ message: "User not found" })
-            if (!user.role === "admin") return res.status(400).json({ message: "User is not admin" })
+            if (!user) return res.status(404).json({ failure: "User not found" })
+            if (!user.role === "admin") return res.status(400).json({ failure: "User is not admin" })
 
             const customers = await userModel.find({ role: "user" })
-            if (!customers) return res.status(404).json({ message: "Customers not found" })
+            if (!customers) return res.status(404).json({ failure: "Customers not found" })
 
             return res.status(200).json({ message: "Successfully get customers", customers })
         } catch (error) {
@@ -68,11 +66,11 @@ class AdminController {
         try {
             const userId = "6a60fb3285d431b959bc48e4"
             const user = await userModel.findById(userId)
-            if (!user) return res.status(404).json({ message: "User not found" })
-            if (!user.role === "admin") return res.status(400).json({ message: "User is not admin" })
+            if (!user) return res.status(404).json({ failure: "User not found" })
+            if (!user.role === "admin") return res.status(400).json({ failure: "User is not admin" })
 
             const orders = await orderModel.find().lean()
-            if (!orders) return res.status(404).json({ message: "Orders not found" })
+            if (!orders) return res.status(404).json({ failure: "Orders not found" })
 
             return res.status(200).json({ message: "Successfully get orders", orders })
         } catch (error) {
@@ -86,11 +84,11 @@ class AdminController {
         try {
             const userId = "6a60fb3285d431b959bc48e4"
             const user = await userModel.findById(userId)
-            if (!user) return res.status(404).json({ message: "User not found" })
-            if (!user.role === "admin") return res.status(400).json({ message: "User is not admin" })
+            if (!user) return res.status(404).json({ failure: "User not found" })
+            if (!user.role === "admin") return res.status(400).json({ failure: "User is not admin" })
 
             const transactions = await transactionModel.find().lean()
-            if (!transactions) return res.status(404).json({ message: "Orders not found" })
+            if (!transactions) return res.status(404).json({ failure: "Orders not found" })
 
             return res.status(200).json({ message: "Successfully get customers", transactions })
         } catch (error) {
@@ -106,12 +104,12 @@ class AdminController {
 
             const userId = "6a60fb3285d431b959bc48e4"
             const user = await userModel.findById(userId)
-            if (!user) return res.status(404).json({ message: "User not found" })
-            if (!user.role === "admin") return res.status(400).json({ message: "User is not admin" })
+            if (!user) return res.status(404).json({ failure: "User not found" })
+            if (!user.role === "admin") return res.status(400).json({ failure: "User is not admin" })
 
             const newProduct = await productModel.create(data)
 
-            if (!newProduct) return res.status(400).json({ message: "Failure while creating product" })
+            if (!newProduct) return res.status(400).json({ failure: "Failure while creating product" })
 
             return res.status(200).json({ message: "Product successfully created" })
         } catch (error) {
@@ -128,11 +126,11 @@ class AdminController {
 
             const userId = "6a60fb3285d431b959bc48e4"
             const user = await userModel.findById(userId)
-            if (!user) return res.status(404).json({ message: "User not found" })
-            if (!user.role === "admin") return res.status(400).json({ message: "User is not admin" })
+            if (!user) return res.status(404).json({ failure: "User not found" })
+            if (!user.role === "admin") return res.status(400).json({ failure: "User is not admin" })
 
             const updatedProduct = await productModel.findByIdAndUpdate(id, data, { new: true })
-            if (!updatedProduct) return res.status(400).json({ message: "Failure while updating product" })
+            if (!updatedProduct) return res.status(400).json({ failure: "Failure while updating product" })
 
             return res.status(200).json({ message: "Product successfully updated" })
         } catch (error) {
@@ -149,11 +147,11 @@ class AdminController {
 
             const userId = "6a60fb3285d431b959bc48e4"
             const user = await userModel.findById(userId)
-            if (!user) return res.status(404).json({ message: "User not found" })
-            if (!user.role === "admin") return res.status(400).json({ message: "User is not admin" })
+            if (!user) return res.status(404).json({ failure: "User not found" })
+            if (!user.role === "admin") return res.status(400).json({ failure: "User is not admin" })
 
             const updatedOrder = await orderModel.findByIdAndUpdate(id, { status })
-            if (!updatedOrder) return res.status(404).json({ message: "Order not found" })
+            if (!updatedOrder) return res.status(404).json({ failure: "Order not found" })
 
             return res.status(200).json({ message: "Order successfully updated", updatedOrder })
         } catch (error) {
@@ -169,11 +167,11 @@ class AdminController {
 
             const userId = "6a60fb3285d431b959bc48e4"
             const user = await userModel.findById(userId)
-            if (!user) return res.status(404).json({ message: "User not found" })
-            if (!user.role === "admin") return res.status(400).json({ message: "User is not admin" })
+            if (!user) return res.status(404).json({ failure: "User not found" })
+            if (!user.role === "admin") return res.status(400).json({ failure: "User is not admin" })
 
             const deletedProduct = await productModel.findByIdAndDelete(id)
-            if (!deletedProduct) return res.status(400).json({ message: "Failure while deleting product" })
+            if (!deletedProduct) return res.status(400).json({ failure: "Failure while deleting product" })
 
             return res.status(200).json({ message: "Product successfully deleted." })
         } catch (error) {

@@ -5,7 +5,7 @@ class OtpController {
         try {
             const { email } = req.body
             await mailService.sendOtpMail(email)
-            return res.status(200).json({ message: "OTP sent successfully" })
+            return res.status(200).json({ status: 200 })
         } catch (error) {
             console.log(error);
             next(error)
@@ -16,16 +16,11 @@ class OtpController {
         try {
             const { email, otp } = req.body
             const result = await mailService.verifyOtp(email, otp)
-            if (result.failure) return res.json({ message: result.failure })
-            res.json({ message: "OTP verified successfully" })
+            res.json(result)
         } catch (error) {
             console.log(error);
             next(error)
         }
-    }
-
-    resendOtp() {
-
     }
 }
 

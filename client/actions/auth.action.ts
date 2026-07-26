@@ -2,7 +2,7 @@
 
 import { axiosClient } from "@/http/axios"
 import { actionClient } from "@/lib/safe-action"
-import { loginSchema } from "@/lib/validation"
+import { emailSchema, loginSchema, registerSchema, verifySchema } from "@/lib/validation"
 import { ReturnActionType } from "@/types"
 import axios from "axios"
 
@@ -21,4 +21,18 @@ export const login = actionClient.schema(loginSchema).action<ReturnActionType>(a
             failure: "Something went wrong"
         }
     }
+})
+export const register = actionClient.schema(registerSchema).action<ReturnActionType>(async ({ parsedInput }) => {
+    const { data } = await axiosClient.post('/api/auth/register', parsedInput)
+    return JSON.parse(JSON.stringify(data))
+})
+
+export const sendOtp = actionClient.schema(emailSchema).action<ReturnActionType>(async ({ parsedInput }) => {
+    const { data } = await axiosClient.post('/api/otp/send', parsedInput)
+    return JSON.parse(JSON.stringify(data))
+})
+
+export const verifyOtp = actionClient.schema(verifySchema).action<ReturnActionType>(async ({ parsedInput }) => {
+    const { data } = await axiosClient.post('/api/otp/verify', parsedInput)
+    return JSON.parse(JSON.stringify(data))
 })

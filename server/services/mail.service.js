@@ -40,13 +40,13 @@ class MailService {
         if (!record) return { failure: 'Record not found' }
         const lastRecord = record[record.length - 1]
         if (!lastRecord) return { failure: 'Record not found' }
-        if (lastRecord.expireAt < new Date()) return { failure: 'OTP expired' }
+        if (lastRecord.expireAt < new Date()) return { status: 301 }
 
         const isValid = await bcrypt.compare(otp, lastRecord.otp)
         if (!isValid) return { failure: 'Invalid OTP' }
 
         await otpModel.deleteMany({ email })
-        return { message: '200' }
+        return { status: 200 }
     }
 }
 
