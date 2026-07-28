@@ -1,6 +1,6 @@
 'use client'
 
-import { createProduct, deleteFile } from '@/actions/admin.action'
+import { createProduct, deleteFile, updateProducts } from '@/actions/admin.action'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -18,12 +18,13 @@ import { productSchema } from '@/lib/validation'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader2, PlusCircle, X } from 'lucide-react'
 import Image from 'next/image'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
 const AddProduct = () => {
-    const { open, setOpen } = useProduct()
+    const { open, setOpen, product, setProduct } = useProduct()
 
     const { isLoading, setIsLoading, onError } = useAction()
 
@@ -33,9 +34,15 @@ const AddProduct = () => {
     })
 
     async function onSubmit(values: z.infer<typeof productSchema>) {
+        // eslint-disable-next-line react-hooks/incompatible-library
         if (!form.watch('image')) return toast('Please upload an image')
         setIsLoading(true)
-        const res = await createProduct(values)
+        let res;
+        if (product?._id) {
+            res = await updateProducts({ ...values, id: product._id })
+        } else {
+            res = await createProduct(values)
+        }
         if (res?.serverError || res?.validationErrors || !res?.data) {
             return onError('Something went wrong')
         }
@@ -48,10 +55,24 @@ const AddProduct = () => {
             form.reset()
             setOpen(false)
         }
+        if (res.data.status === 200) {
+            toast('Product successfully updated')
+            setIsLoading(false)
+            form.reset()
+            setOpen(false)
+        }
     }
 
     function onOpen() {
         setOpen(true)
+        setProduct({
+            _id: '',
+            title: '',
+            description: '',
+            category: '',
+            price: 0,
+            image: '', imageKey: ''
+        })
     }
 
     function onDelete() {
@@ -59,6 +80,13 @@ const AddProduct = () => {
         form.setValue('image', '')
         form.setValue('imageKey', '')
     }
+
+    useEffect(() => {
+        if (product) {
+            form.reset({ ...product, price: product.price.toString() })
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [product])
 
     return (
         <>
@@ -114,7 +142,7 @@ const AddProduct = () => {
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
-                                                {categories.map(category => (
+                                                {categories.slice(1).map(category => (
                                                     <SelectItem value={category} key={category}>
                                                         {category}
                                                     </SelectItem>

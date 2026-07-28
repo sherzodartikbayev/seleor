@@ -3,10 +3,27 @@ import { Separator } from '@/components/ui/separator'
 import AddProduct from '../_components/add-product'
 import ProductCard from '../_components/product.card'
 import { getAdminProducts } from '@/actions/admin.action'
+import { SearchParams } from '@/types'
+import { FC } from 'react'
+import Pagination from '@/components/shared/pagination'
 
-const Page = async () => {
-    const res = await getAdminProducts()
+interface Props {
+    searchParams: SearchParams
+}
+
+const Page: FC<Props> = async props => {
+    const searchParams = await props.searchParams
+    console.log(searchParams);
+
+
+    const res = await getAdminProducts({
+        searchQuery: `${searchParams.q || ''}`,
+        filter: `${searchParams.filter || ''}`,
+        category: `${searchParams.category || ''}`,
+        page: `${searchParams.page || '1'} `
+    })
     const products = res.data?.products
+    const isNext = res.data?.isNext || false
 
     return (
         <>
@@ -27,6 +44,12 @@ const Page = async () => {
                     <ProductCard key={product._id} product={product} />
                 ))}
             </div>
+
+            <Pagination
+                isNext={isNext}
+                pageNumber={searchParams?.page ? +searchParams.page : 1}
+            />
+
         </>
     )
 }

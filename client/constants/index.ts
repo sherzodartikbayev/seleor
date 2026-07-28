@@ -27,7 +27,7 @@ export const products = [
     }
 ]
 
-export const categories = ['Ali', 'Shoes', 'T-shirts', 'Clothes', 'Books', 'Accessories', "Universal"]
+export const categories = ['All', 'Shoes', 'T-shirts', 'Clothes', 'Books', 'Accessories', "Universal"]
 
 export const dashboardSidebar = [
     { name: 'Personal Information', route: '/dashboard', icon: User },
