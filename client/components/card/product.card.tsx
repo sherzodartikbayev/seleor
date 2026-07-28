@@ -8,13 +8,37 @@ import { Button } from "../ui/button"
 import { Heart } from "lucide-react"
 import { formatPrice } from "@/lib/utils"
 import NoSSR from 'react-no-ssr'
+import useAction from "@/hooks/use-action"
+import { addFavorite } from "@/actions/user.action"
+import { toast } from "sonner"
 
 interface Props {
-    product: Partial<IProduct>
+    product: IProduct
 }
 
 const ProductCard: FC<Props> = ({ product }) => {
+    const { isLoading, setIsLoading, onError } = useAction()
     const router = useRouter()
+
+    const onFavorite = async (e: MouseEvent) => {
+        e.stopPropagation()
+        setIsLoading(true)
+        const res = await addFavorite({ id: product._id })
+        if (res?.serverError || res?.validationErrors || !res?.data) {
+            return onError('Product already in favorites')
+        }
+        if (res.data.failure) {
+            return onError(res.data.failure)
+        }
+        if (res.data.failure) {
+            setIsLoading(false)
+            onError(res.data.failure)
+        }
+        if (res.data.status === 200) {
+            setIsLoading(false)
+            toast('Product added to favorites')
+        }
+    }
 
     return (
         <div onClick={() => router.push(`/product/${product._id}`)} className="cursor-pointer">
@@ -26,7 +50,7 @@ const ProductCard: FC<Props> = ({ product }) => {
                     alt={product.title!}
                 />
                 <div className="absolute right-0 top-0 z-50 opacity-0 group-hover:opacity-100 transition-all">
-                    <Button size='icon'>
+                    <Button size='icon' disabled={isLoading} onClick={onFavorite}>
                         <Heart />
                     </Button>
                 </div>

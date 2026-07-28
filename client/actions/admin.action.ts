@@ -56,6 +56,19 @@ export const getOrders = actionClient.schema(searchParamsSchema).action<ReturnAc
     }
 })
 
+export const getTransactions = actionClient.schema(searchParamsSchema).action<ReturnActionType>(async ({ parsedInput }) => {
+    try {
+        const session = await getServerSession(authOptions)
+        const token = await generateToken(session?.currentUser?._id)
+        const { data } = await axiosClient.get('/api/admin/transactions', {
+            headers: { Authorization: `Bearer ${token}` },
+            params: parsedInput
+        })
+        return JSON.parse(JSON.stringify(data))
+    } catch (error) {
+        console.log(error)
+    }
+})
 
 export const createProduct = actionClient.schema(productSchema).action<ReturnActionType>(async ({ parsedInput }) => {
     try {

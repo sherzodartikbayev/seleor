@@ -8,10 +8,33 @@ class UserController {
     // [GET] /products
     async getProducts(req, res, next) {
         try {
-            const products = await productModel.find().lean()
-            if (!products) return res.status(404).json({ failure: "Products not found" })
+            const { searchQuery, filter, category, page, pageSize } = req.query
+            const skipAmount = (+page - 1) * +pageSize
+            const query = {}
+            if (searchQuery) {
+                const escapedSearchQuery = searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+                query.$or = [{ title: { $regex: new RegExp(escapedSearchQuery, 'i') } }]
+            }
 
-            return res.status(200).json({ message: "Products successfully get", products })
+            if (category === 'All') query.category = { $exists: true }
+            else if (category !== 'All') {
+                if (category) query.category = category
+            }
+
+            let sortOptions = { createdAt: -1 }
+            if (filter === "newest") sortOptions = { createdAt: -1 }
+            else if (filter === "oldest") sortOptions = { createdAt: 1 }
+
+
+            const products = await productModel.find(query).lean().sort(sortOptions).skip(skipAmount).limit(+pageSize)
+            if (!products) {
+                return res.status(404).json({ failure: "Products not found" })
+            }
+
+            const totalProducts = await productModel.countDocuments(query)
+            const isNext = totalProducts > skipAmount + +products.length
+
+            return res.status(200).json({ products, isNext })
         } catch (error) {
             console.log(error);
             next(error)
@@ -117,14 +140,11 @@ class UserController {
     async addFavorite(req, res, next) {
         try {
             const { productId } = req.body
-
-            const userId = '6a60fb3285d431b959bc48e4'
-            const user = await userModel.findById(userId)
-            if (!user) return res.status(404).json({ failure: "User not found" })
-            user.favorites.push(productId)
-            await user.save()
-
-            return res.status(200).json(user)
+            const userId = req.user._id
+            const isExist = await userModel.findOne({ _id: userId, favorites: productId })
+            if (isExist) return res.status(400).json({ failure: 'Product already in favorites' })
+            await userModel.findByIdAndUpdate(userId, { $push: { favorites: productId } })
+            return res.status(200).json({ status: 200 })
         } catch (error) {
             console.log(error);
             next(error)

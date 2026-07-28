@@ -13,8 +13,6 @@ interface Props {
 
 const Page: FC<Props> = async props => {
     const searchParams = await props.searchParams
-    console.log(searchParams);
-
 
     const res = await getAdminProducts({
         searchQuery: `${searchParams.q || ''}`,
@@ -34,7 +32,7 @@ const Page: FC<Props> = async props => {
 
             <Separator className='my-3' />
 
-            <Filter />
+            <Filter showCategory />
 
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mt-3'>
                 {products && products?.length === 0 && (
