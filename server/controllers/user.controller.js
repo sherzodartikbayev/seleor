@@ -120,7 +120,7 @@ class UserController {
     // [GET] /statistics
     async getStatistics(req, res, next) {
         try {
-            const userId = '6a60fb3285d431b959bc48e4'
+            const userId = req.user._id
             const user = await userModel.findById(userId)
 
             if (!user) return res.status(404).json({ failure: "User not found" })
@@ -128,15 +128,16 @@ class UserController {
             const totalOrders = await orderModel.countDocuments({ user: user._id })
             const totalTransactions = await transactionModel.countDocuments({ user: user._id })
             const totalFavourites = user.favorites.length
+            const statistics = { totalOrders, totalTransactions, totalFavourites }
 
-            return res.status(200).json({ totalOrders, totalTransactions, totalFavourites })
+            return res.status(200).json({ statistics })
         } catch (error) {
             console.log(error);
             next(error)
         }
     }
 
-    // [POST] /add-favorite
+    // [POST] /favorite
     async addFavorite(req, res, next) {
         try {
             const { productId } = req.body
@@ -151,29 +152,28 @@ class UserController {
         }
     }
 
-    // [PUT] /update-profile
+    // [PUT] /profile
     async updateProfile(req, res, next) {
         try {
-            const userId = '6a60fb3285d431b959bc48e4'
+            const userId = req.user._id
+
             const user = await userModel.findById(userId)
             if (!user) return res.status(404).json({ failure: "User not found" })
+            await userModel.findByIdAndUpdate(userId, req.body)
 
-            user.set(req.body)
-            await user.save()
-
-            return res.status(200).json({ message: "Profile successfully updated", user })
+            return res.status(200).json({ status: 200 })
         } catch (error) {
             console.log(error);
             next(error)
         }
     }
 
-    // [PUT] /update-password
+    // [PUT] /password
     async updatePassword(req, res, next) {
         try {
             const { oldPassword, newPassword } = req.body
 
-            const userId = '6a625fa38bc39639ad428a9f'
+            const userId = req.user._id
             const user = await userModel.findById(userId)
 
             if (!user) return res.status(404).json({ failure: "User not found" })
@@ -184,14 +184,14 @@ class UserController {
             const hashedPassword = await bcrypt.hash(newPassword, 10)
             await userModel.findByIdAndUpdate(userId, { password: hashedPassword })
 
-            return res.status(200).json({ message: 'Password successfully updated' })
+            return res.status(200).json({ status: 200 })
         } catch (error) {
             console.log(error);
             next(error)
         }
     }
 
-    // [DELETE] /user/delete-favorite/:id
+    // [DELETE] /favorite/:id
     async deleteFavorite(req, res, next) {
         try {
             const { id } = req.params

@@ -1,5 +1,6 @@
 'use client'
 
+import { updatePassword, updateUser } from '@/actions/user.action'
 import {
     AlertDialog,
     AlertDialogAction,
@@ -15,20 +16,45 @@ import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
+import useAction from '@/hooks/use-action'
 import { passwordSchema } from '@/lib/validation'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Label } from '@radix-ui/react-label'
+import { signOut } from 'next-auth/react'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { z } from 'zod'
 
 const Page = () => {
+    const { isLoading, setIsLoading, onError } = useAction()
+
     const form = useForm<z.infer<typeof passwordSchema>>({
         resolver: zodResolver(passwordSchema),
         defaultValues: { confirmPassword: '', newPassword: '', oldPassword: '' },
     })
 
+    const onDelete = async () => {
+        setIsLoading(true)
+        const res = await updateUser({ isDeleted: true, deletedAt: new Date() })
+        if (res?.serverError || res?.validationErrors || !res?.data) return onError('Something went wrong')
+        if (res.data.failure) return onError(res.data.failure)
+        if (res.data.status === 200) {
+            setIsLoading(false)
+            toast('Account successfully deleted')
+            signOut({ callbackUrl: '/sign-in' })
+        }
+    }
+
     async function onSubmit(values: z.infer<typeof passwordSchema>) {
-        console.log(values)
+        setIsLoading(true)
+        const res = await updatePassword(values)
+        if (res?.serverError || res?.validationErrors || !res?.data) return onError('Something went wrong')
+        if (res.data.failure) return onError(res.data.failure)
+        if (res.data.status === 200) {
+            setIsLoading(false)
+            toast('Password successfully updated')
+            form.reset()
+        }
     }
 
     return (
@@ -55,7 +81,7 @@ const Page = () => {
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction>Continue</AlertDialogAction>
+                            <AlertDialogAction onClick={onDelete} disabled={isLoading}>Continue</AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialog>
@@ -72,7 +98,13 @@ const Page = () => {
                                     <FormItem className='space-y-0'>
                                         <Label>Old password</Label>
                                         <FormControl>
-                                            <Input placeholder='****' type='password' className='bg-white' {...field} />
+                                            <Input
+                                                placeholder='****'
+                                                type='password'
+                                                className='bg-white'
+                                                disabled={isLoading}
+                                                {...field}
+                                            />
                                         </FormControl>
                                         <FormMessage className='text-xs text-red-500' />
                                     </FormItem>
@@ -85,7 +117,13 @@ const Page = () => {
                                     <FormItem className='space-y-0'>
                                         <Label>New password</Label>
                                         <FormControl>
-                                            <Input placeholder='****' type='password' className='bg-white' {...field} />
+                                            <Input
+                                                placeholder='****'
+                                                type='password'
+                                                className='bg-white'
+                                                disabled={isLoading}
+                                                {...field}
+                                            />
                                         </FormControl>
                                         <FormMessage className='text-xs text-red-500' />
                                     </FormItem>
@@ -98,13 +136,19 @@ const Page = () => {
                                     <FormItem className='space-y-0'>
                                         <Label>Confirm password</Label>
                                         <FormControl>
-                                            <Input placeholder='****' type='password' className='bg-white' {...field} />
+                                            <Input
+                                                placeholder='****'
+                                                type='password'
+                                                className='bg-white'
+                                                disabled={isLoading}
+                                                {...field}
+                                            />
                                         </FormControl>
                                         <FormMessage className='text-xs text-red-500' />
                                     </FormItem>
                                 )}
                             />
-                            <Button type='submit'>Submit</Button>
+                            <Button type='submit' disabled={isLoading}>Submit</Button>
                         </form>
                     </Form>
                 </div>

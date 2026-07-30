@@ -12,6 +12,8 @@ class AuthController {
             const isValidPassword = await bcrypt.compare(password, user.password)
             if (!isValidPassword) return res.status(400).json({ failure: "Invalid password" })
 
+            if (user.isDeleted) return res.status(400).json({ failure: `User is deleted at ${user.deletedAt.toLocaleString()}` })
+
             return res.json({ user })
         } catch (error) {
             console.log(error)
