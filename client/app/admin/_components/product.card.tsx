@@ -65,7 +65,7 @@ const ProductCard: FC<Props> = ({ product }) => {
                         <p className='font-medium'>{formatPrice(product.price!)}</p>
                     </NoSSR>
                 </div>
-                <p className='text-xs text-muted-foreground leading-1 mb-5'>{product.description}</p>
+                <p className='text-xs text-muted-foreground'>{product.description}</p>
                 <Separator className='my-2' />
             </div>
 

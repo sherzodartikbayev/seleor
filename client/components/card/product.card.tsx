@@ -3,7 +3,7 @@
 import { IProduct } from '@/types'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { FC, MouseEvent } from 'react'
+import { FC, MouseEvent, useState } from 'react'
 import { Button } from '../ui/button'
 import { Heart } from 'lucide-react'
 import { formatPrice } from '@/lib/utils'
@@ -16,6 +16,8 @@ interface Props {
     product: IProduct
 }
 const ProductCard: FC<Props> = ({ product }) => {
+    const [isFavorite, setIsFavorite] = useState(false)
+
     const { isLoading, onError, setIsLoading } = useAction()
     const router = useRouter()
 
@@ -31,6 +33,7 @@ const ProductCard: FC<Props> = ({ product }) => {
         }
         if (res.data.status === 200) {
             toast('Added to favorites')
+            setIsFavorite(true)
             setIsLoading(false)
         }
     }
@@ -41,7 +44,7 @@ const ProductCard: FC<Props> = ({ product }) => {
                 <Image src={product.image!} width={300} height={300} className='mx-auto' alt={product.title!} />
                 <div className='absolute right-0 top-0 z-50 opacity-0 group-hover:opacity-100 transition-all'>
                     <Button size={'icon'} disabled={isLoading} onClick={onFavourite}>
-                        <Heart />
+                        <Heart className={isFavorite ? 'text-red-500 fill-red-500' : ''} />
                     </Button>
                 </div>
             </div>

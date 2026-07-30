@@ -49,7 +49,7 @@ const WatchListCard: FC<Props> = ({ product }) => {
                         <p className='font-medium'>{formatPrice(+product.price!)}</p>
                     </NoSSR>
                 </div>
-                <p className='text-xs text-muted-foreground leading-1 line-clamp-5 py-2'>
+                <p className='text-xs text-muted-foreground line-clamp-5 py-2'>
                     {product.description}
                 </p>
             </div>
