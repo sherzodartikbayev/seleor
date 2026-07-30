@@ -2,7 +2,7 @@ const orderModel = require("../models/order.model");
 const productModel = require("../models/product.model");
 const transactionModel = require("../models/transaction.model");
 const userModel = require("../models/user.model");
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcrypt');
 
 class UserController {
     // [GET] /products
@@ -72,12 +72,43 @@ class UserController {
     // [GET] /orders
     async getOrders(req, res, next) {
         try {
-            const userId = '6a60fb3285d431b959bc48e4'
-            const orders = await orderModel.find({ user: userId })
+            const currentUser = req.user
+            const { searchQuery, filter, page, pageSize } = req.query
+            const skipAmount = (page - 1) * pageSize
 
-            if (!orders) return res.status(404).json({ failure: "Order not found" })
+            const matchQuery = { user: currentUser._id }
 
-            return res.status(200).json({ message: "Orders successfully get", orders })
+            if (searchQuery) {
+                const escapedSearchQuery = searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+                matchQuery.$or = [{ 'product.title': { $regex: new RegExp(escapedSearchQuery, 'i') } }]
+            }
+
+            let sortOptions = { createdAt: -1 }
+            if (filter === 'newest') sortOptions = { createdAt: -1 }
+            else if (filter === 'oldest') sortOptions = { createdAt: 1 }
+
+            const orders = await orderModel.aggregate([
+                { $lookup: { from: 'products', localField: 'product', foreignField: '_id', as: 'product' } },
+                { $unwind: '$product' },
+                { $match: matchQuery },
+                { $sort: sortOptions },
+                { $skip: skipAmount },
+                { $limit: +pageSize },
+                {
+                    $project: {
+                        'product.title': 1,
+                        createdAt: 1,
+                        updatedAt: 1,
+                        price: 1,
+                        status: 1,
+                    }
+                }
+            ])
+
+            const totalOrders = await orderModel.countDocuments(matchQuery)
+            const isNext = totalOrders > skipAmount + orders.length
+
+            return res.status(200).json({ orders, isNext })
         } catch (error) {
             console.log(error);
             next(error)
@@ -87,12 +118,46 @@ class UserController {
     // [GET] /transactions
     async getTransactions(req, res, next) {
         try {
-            const userId = '6a60fb3285d431b959bc48e4'
-            const transactions = await transactionModel.find({ user: userId })
+            const currentUser = req.user
+            const { searchQuery, filter, page, pageSize } = req.query
+            const skipAmount = (page - 1) * pageSize
 
-            if (!transactions) return res.status(404).json({ failure: "Transactions not found" })
+            const matchQuery = { user: currentUser._id }
 
-            return res.status(200).json({ message: "Transactions succussfully get", transactions })
+            if (searchQuery) {
+                const escapedSearchQuery = searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+                matchQuery.$or = [{ 'product.title': { $regex: new RegExp(escapedSearchQuery, 'i') } }]
+            }
+
+            let sortOptions = { createdAt: -1 }
+            if (filter === 'newest') sortOptions = { createdAt: -1 }
+            else if (filter === 'oldest') sortOptions = { createdAt: 1 }
+
+            const transactions = await transactionModel.aggregate([
+                { $lookup: { from: 'products', localField: 'product', foreignField: '_id', as: 'product' } },
+                { $unwind: '$product' },
+                { $match: matchQuery },
+                { $sort: sortOptions },
+                { $skip: skipAmount },
+                { $limit: +pageSize },
+                {
+                    $project: {
+                        'product.title': 1,
+                        amount: 1,
+                        state: 1,
+                        provider: 1,
+                        created_time: 1,
+                        perform_time: 1,
+                        cancel_time: 1,
+                        reason: 1,
+                    }
+                }
+            ])
+
+            const totalTransactions = await transactionModel.countDocuments(matchQuery)
+            const isNext = totalTransactions > skipAmount + transactions.length
+
+            return res.status(200).json({ transactions, isNext })
         } catch (error) {
             console.log(error);
             next(error)
@@ -102,17 +167,34 @@ class UserController {
     // [GET] /favorites
     async getFavorites(req, res, next) {
         try {
-            const userId = '6a60fb3285d431b959bc48e4'
-            const user = await userModel.findById(userId).populate('favorites')
+            const currentUser = req.user
+            const { searchQuery, filter, page, pageSize, category } = req.query
+            const skipAmount = (page - 1) * pageSize
 
-            if (!user) return res.status(404).json({ failure: "User not found" })
+            const user = await userModel.findById(currentUser._id)
+            const matchQuery = { _id: { $in: user.favorites } }
 
-            return res.status(200).json({
-                message: "Favorites successfully get",
-                favorites: user.favorites
-            })
+            if (searchQuery) {
+                const escapedSearchQuery = searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+                matchQuery.$or = [{ title: { $regex: new RegExp(escapedSearchQuery, 'i') } }]
+            }
+
+            if (category === 'All') matchQuery.category = { $exists: true }
+            else if (category !== 'All') {
+                if (category) matchQuery.category = category
+            }
+
+            let sortOptions = {}
+            if (filter === 'newest') sortOptions = { createdAt: -1 }
+            else if (filter === 'oldest') sortOptions = { createdAt: 1 }
+
+            const products = await productModel.find(matchQuery).sort(sortOptions).skip(skipAmount).limit(+pageSize)
+
+            const totalProducts = await productModel.countDocuments(matchQuery)
+            const isNext = totalProducts > skipAmount + +products.length
+
+            return res.json({ products, isNext })
         } catch (error) {
-            console.log(error);
             next(error)
         }
     }
@@ -142,9 +224,12 @@ class UserController {
         try {
             const { productId } = req.body
             const userId = req.user._id
+
             const isExist = await userModel.findOne({ _id: userId, favorites: productId })
             if (isExist) return res.status(400).json({ failure: 'Product already in favorites' })
+
             await userModel.findByIdAndUpdate(userId, { $push: { favorites: productId } })
+
             return res.status(200).json({ status: 200 })
         } catch (error) {
             console.log(error);
@@ -195,15 +280,15 @@ class UserController {
     async deleteFavorite(req, res, next) {
         try {
             const { id } = req.params
+            const userId = req.user._id
 
-            const userId = '6a60fb3285d431b959bc48e4'
             const user = await userModel.findById(userId)
             if (!user) return res.status(404).json({ failure: "User not found" })
 
             user.favorites.pull(id)
             await user.save()
 
-            return res.status(200).json({ message: 'Product removed from favorites' })
+            return res.status(200).json({ status: 200 })
         } catch (error) {
             console.log(error);
             next(error)

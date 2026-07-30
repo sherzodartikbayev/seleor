@@ -48,6 +48,11 @@ const Page: FC<Props> = async (props) => {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
+                    {orders && orders.length === 0 && (
+                        <TableRow>
+                            <TableCell colSpan={6} className='text-center'>No orders found.</TableCell>
+                        </TableRow>
+                    )}
                     {orders && orders.map(order => (
                         <TableRow key={order._id}>
                             <TableCell>{order.product.title}</TableCell>
