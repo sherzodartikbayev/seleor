@@ -241,9 +241,11 @@ class AdminController {
                 currency: "usd",
                 metadata: {
                     productId: newProduct._id.toString(),
+                    name: newProduct.title,
                     userId: userId.toString(),
                 },
             });
+
             await productModel.findByIdAndUpdate(newProduct._id, { stripeProductId: product.id, stripePriceId: price.id })
 
             return res.status(201).json({ status: 201 })

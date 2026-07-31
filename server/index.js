@@ -5,7 +5,11 @@ const cors = require('cors')
 const cookieParser = require('cookie-parser')
 const { default: mongoose } = require('mongoose')
 const errorMiddleware = require('./middlewares/error.middleware')
+const stripeController = require('./controllers/stripe.controller')
 const app = express()
+
+// Webhook
+app.post('/webhook/stripe', express.raw({ type: 'application/json' }), stripeController.webhook)
 
 // Middleware
 app.use(express.json())

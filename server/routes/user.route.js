@@ -12,6 +12,7 @@ router.get('/favorites', userMiddleware, userController.getFavorites)
 router.get('/statistics', userMiddleware, userController.getStatistics)
 
 router.post('/favorite', userMiddleware, userController.addFavorite)
+router.post('/stripe/checkout', userMiddleware, userController.stripeCheckout)
 
 router.put('/profile', userMiddleware, userController.updateProfile)
 router.put('/password', userMiddleware, userController.updatePassword)

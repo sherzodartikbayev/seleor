@@ -120,6 +120,22 @@ export const addFavorite = actionClient.schema(idSchema).action<ReturnActionType
     }
 })
 
+export const stripeCheckout = actionClient.schema(idSchema).action<ReturnActionType>(async ({ parsedInput }) => {
+    try {
+        const session = await getServerSession(authOptions)
+        if (!session?.currentUser) return { failure: 'You must be logged in to apply for a product' }
+        const token = await generateToken(session?.currentUser?._id)
+        const { data } = await axiosClient.post(
+            '/api/user/stripe/checkout',
+            { productId: parsedInput.id },
+            { headers: { Authorization: `Bearer ${token}` } }
+        )
+        return JSON.parse(JSON.stringify(data))
+    } catch (error) {
+        console.log(error);
+    }
+})
+
 export const updateUser = actionClient.schema(updateUserSchema).action<ReturnActionType>(async ({ parsedInput }) => {
     try {
         const session = await getServerSession(authOptions)

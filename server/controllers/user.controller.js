@@ -1,8 +1,10 @@
+const { getCustomer } = require("../libs/customer");
 const orderModel = require("../models/order.model");
 const productModel = require("../models/product.model");
 const transactionModel = require("../models/transaction.model");
 const userModel = require("../models/user.model");
 const bcrypt = require('bcrypt');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 
 class UserController {
     // [GET] /products
@@ -231,6 +233,34 @@ class UserController {
             await userModel.findByIdAndUpdate(userId, { $push: { favorites: productId } })
 
             return res.status(200).json({ status: 200 })
+        } catch (error) {
+            console.log(error);
+            next(error)
+        }
+    }
+
+    async stripeCheckout(req, res, next) {
+        try {
+            const { productId } = req.body
+            const currentUser = req.user
+
+            const customer = await getCustomer(currentUser._id)
+            const product = await productModel.findById(productId)
+
+            const session = await stripe.checkout.sessions.create({
+                payment_method_types: ['card'],
+                customer: customer.id,
+                mode: 'payment',
+                metadata: { productId: product._id.toString(), userId: currentUser._id.toString() },
+                line_items: [{ price: product.stripePriceId, quantity: 1 }],
+                success_url: `${process.env.CLIENT_URL}/success?productId=${product._id}&userId=${currentUser._id}`,
+                cancel_url: `${process.env.CLIENT_URL}/cancel?productId=${product._id}&userId=${currentUser._id}`,
+                payment_intent_data: {
+                    metadata: { productId: product._id.toString(), userId: currentUser._id.toString() },
+                },
+            })
+
+            return res.status(200).json({ status: 200, checkoutUrl: session.url })
         } catch (error) {
             console.log(error);
             next(error)
