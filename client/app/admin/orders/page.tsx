@@ -7,7 +7,7 @@ import { FC } from 'react'
 import { getOrders } from '@/actions/admin.action'
 import Pagination from '@/components/shared/pagination'
 import { Badge } from '@/components/ui/badge'
-import { formatPrice } from '@/lib/utils'
+import { formatPrice, sliceText } from '@/lib/utils'
 import { format } from 'date-fns'
 
 interface Props {
@@ -56,11 +56,15 @@ const Page: FC<Props> = async (props) => {
                     {orders && orders.map(order => (
                         <TableRow key={order._id}>
                             <TableCell>{order.product.title}</TableCell>
-                            <TableCell>{order.user.email}</TableCell>
+                            <TableCell>{sliceText(order.user.email, 20)}</TableCell>
                             <TableCell>
-                                <Badge variant='secondary'>{formatPrice(order.price)}</Badge>
+                                <Badge variant='secondary' className='font-bold'>{formatPrice(order.price)}</Badge>
                             </TableCell>
-                            <TableCell>{order.status}</TableCell>
+                            <TableCell>
+                                <Badge>
+                                    {order.status}
+                                </Badge>
+                            </TableCell>
                             <TableCell>{format(new Date(order.createdAt), 'dd/MM/yyyy')}</TableCell>
                             <TableCell className='text-right'>
                                 <OrderActions />

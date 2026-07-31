@@ -145,6 +145,7 @@ class UserController {
                 {
                     $project: {
                         'product.title': 1,
+                        'product.image': 1,
                         amount: 1,
                         state: 1,
                         provider: 1,
