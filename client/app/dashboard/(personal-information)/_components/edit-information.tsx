@@ -69,7 +69,7 @@ const EditInformation: FC<Props> = ({ user }) => {
                                 endpoint={'imageUploader'}
                                 config={{ appendOnPaste: true, mode: 'auto' }}
                                 appearance={{ container: { height: 200, padding: 10 } }}
-                                onClientUploadComplete={res => onUpdateAvatar(res[0].ufsUrl, res[0].key)}
+                                onClientUploadComplete={res => onUpdateAvatar(res[0].url, res[0].key)}
                             />
                         </DialogContent>
                     </Dialog>
