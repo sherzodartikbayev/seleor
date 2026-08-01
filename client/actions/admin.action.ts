@@ -4,7 +4,7 @@ import { axiosClient } from '@/http/axios';
 import { authOptions } from '@/lib/auth-options';
 import { generateToken } from '@/lib/generate-token';
 import { actionClient } from '@/lib/safe-action';
-import { idSchema, productSchema, searchParamsSchema, updateProductSchema } from '@/lib/validation';
+import { idSchema, productSchema, searchParamsSchema, updateProductSchema, updateStatusSchema } from '@/lib/validation';
 import { ReturnActionType } from '@/types';
 import { getServerSession } from 'next-auth';
 import { revalidatePath } from 'next/cache';
@@ -90,6 +90,23 @@ export const updateProducts = actionClient.schema(updateProductSchema).action<Re
         const token = await generateToken(session?.currentUser?._id)
         const { data } = await axiosClient.put(`/api/admin/product/${parsedInput.id}`, parsedInput, { headers: { Authorization: `Bearer ${token}` } })
         revalidatePath('/admin/products')
+        return JSON.parse(JSON.stringify(data))
+    } catch (error) {
+        console.log(error);
+    }
+})
+
+export const updateOrder = actionClient.schema(updateStatusSchema).action<ReturnActionType>(async ({ parsedInput }) => {
+    try {
+        const session = await getServerSession(authOptions)
+        const token = await generateToken(session?.currentUser?._id)
+        const { id, status } = parsedInput
+        const { data } = await axiosClient.put(
+            `/api/admin/order/${id}`,
+            { status },
+            { headers: { Authorization: `Bearer ${token}` } }
+        )
+        revalidatePath('/admin/orders')
         return JSON.parse(JSON.stringify(data))
     } catch (error) {
         console.log(error);

@@ -67,7 +67,7 @@ const UserBox: FC<Props> = ({ user }) => {
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel onClick={() => setOpen(false)}>Cancel</AlertDialogCancel>
                         <AlertDialogAction onClick={() => signOut({ callbackUrl: '/sign-in' })}>Continue</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

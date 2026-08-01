@@ -14,7 +14,6 @@ interface Props {
     searchParams: SearchParams
 }
 
-
 const Page: FC<Props> = async (props) => {
     const searchParams = await props.searchParams
 
@@ -56,7 +55,7 @@ const Page: FC<Props> = async (props) => {
                     {orders && orders.map(order => (
                         <TableRow key={order._id}>
                             <TableCell>{order.product.title}</TableCell>
-                            <TableCell>{sliceText(order.user.email, 20)}</TableCell>
+                            <TableCell>{sliceText(order.user.email, 10)}</TableCell>
                             <TableCell>
                                 <Badge variant='secondary' className='font-bold'>{formatPrice(order.price)}</Badge>
                             </TableCell>
@@ -67,7 +66,7 @@ const Page: FC<Props> = async (props) => {
                             </TableCell>
                             <TableCell>{format(new Date(order.createdAt), 'dd/MM/yyyy')}</TableCell>
                             <TableCell className='text-right'>
-                                <OrderActions />
+                                <OrderActions order={order} />
                             </TableCell>
                         </TableRow>
                     ))}

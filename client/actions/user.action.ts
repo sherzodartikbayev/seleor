@@ -79,7 +79,7 @@ export const getFavorites = actionClient.schema(searchParamsSchema).action<Retur
 export const getStatistics = actionClient.action<ReturnActionType>(async () => {
     try {
         const session = await getServerSession(authOptions)
-        if (!session?.currentUser) return { failure: 'You must be logged in to update your profile' }
+        if (!session?.currentUser) return { failure: 'You must be logged in to get statistics' }
         const token = await generateToken(session?.currentUser?._id)
         const { data } = await axiosClient.get('/api/user/statistics', {
             headers: { Authorization: `Bearer ${token}` },
@@ -154,7 +154,7 @@ export const updateUser = actionClient.schema(updateUserSchema).action<ReturnAct
 export const updatePassword = actionClient.schema(passwordSchema).action<ReturnActionType>(async ({ parsedInput }) => {
     try {
         const session = await getServerSession(authOptions)
-        if (!session?.currentUser) return { failure: 'You must be logged in to update your profile' }
+        if (!session?.currentUser) return { failure: 'You must be logged in to update your password' }
         const token = await generateToken(session?.currentUser?._id)
         const { data } = await axiosClient.put('/api/user/password', parsedInput, {
             headers: { Authorization: `Bearer ${token}` },
@@ -176,7 +176,7 @@ export const updatePassword = actionClient.schema(passwordSchema).action<ReturnA
 export const deleteFavorite = actionClient.schema(idSchema).action<ReturnActionType>(async ({ parsedInput }) => {
     try {
         const session = await getServerSession(authOptions)
-        if (!session?.currentUser) return { failure: 'You must be logged in to update your profile' }
+        if (!session?.currentUser) return { failure: 'You must be logged in to delete your account' }
         const token = await generateToken(session?.currentUser?._id)
         const { data } = await axiosClient.delete(`/api/user/favorite/${parsedInput.id}`, {
             headers: { Authorization: `Bearer ${token}` }

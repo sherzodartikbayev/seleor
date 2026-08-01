@@ -16,7 +16,7 @@ class OtpController {
         try {
             const { email, otp } = req.body
             const result = await mailService.verifyOtp(email, otp)
-            res.json(result)
+            res.status(200).json(result)
         } catch (error) {
             console.log(error);
             next(error)
