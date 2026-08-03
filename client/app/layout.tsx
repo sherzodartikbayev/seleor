@@ -7,6 +7,7 @@ import { FC } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import Navbar from "@/components/shared/navbar";
 import SessionProvider from "@/components/providers/session.provider";
+import NextTopLoader from 'nextjs-toploader'
 
 const montserrat = Montserrat({
   weight: ['400', '500', '600', '700', '800', '900'],
@@ -35,6 +36,7 @@ const RootLayout: FC<ChildProps> = ({ children }) => {
           </main>
           {/* Toaster */}
           <Toaster />
+          <NextTopLoader showSpinner={false} />
         </SessionProvider>
       </body>
     </html>
