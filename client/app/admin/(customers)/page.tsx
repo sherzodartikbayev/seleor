@@ -16,7 +16,7 @@ interface Props {
 }
 
 const Page: FC<Props> = async (props) => {
-    const searchParams = await props.searchParams
+    const searchParams = props.searchParams
     const res = await getCustomers({
         searchQuery: `${searchParams.q || ''}`,
         filter: `${searchParams.filter || ''}`,
