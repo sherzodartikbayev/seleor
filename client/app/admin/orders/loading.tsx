@@ -1,4 +1,3 @@
-import Filter from '@/components/shared/filter'
 import { Separator } from '@/components/ui/separator'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Loader } from 'lucide-react'
@@ -8,7 +7,6 @@ const Loading = () => {
         <>
             <div className='flex justify-between items-center w-full'>
                 <h1 className='text-xl font-bold'>Orders</h1>
-                <Filter />
             </div>
 
             <Separator className='my-3' />

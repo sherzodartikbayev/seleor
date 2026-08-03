@@ -1,5 +1,4 @@
 import CardLoader from "@/components/loaders/card.loader"
-import Filter from "@/components/shared/filter"
 import { Separator } from "@/components/ui/separator"
 
 const Loading = () => {
@@ -7,7 +6,6 @@ const Loading = () => {
         <>
             <div className="flex justify-between items-center">
                 <h2 className="text-xl font-bold">Products</h2>
-                <Filter showCategory />
             </div>
 
             <Separator className="my-3" />
