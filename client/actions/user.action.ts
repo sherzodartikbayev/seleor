@@ -136,6 +136,18 @@ export const stripeCheckout = actionClient.schema(idSchema).action<ReturnActionT
     }
 })
 
+export const clickCheckout = actionClient.schema(idSchema).action<ReturnActionType>(async ({ parsedInput }) => {
+    const session = await getServerSession(authOptions)
+    if (!session) return { failure: "You need to be logged in to make a purchase" }
+    const token = await generateToken(session.currentUser?._id)
+    const { data } = await axiosClient.post(
+        '/api/click/checkout',
+        { productId: parsedInput.id, url: `${process.env.NEXTAUTH_URL}/dashboard` },
+        { headers: { Authorization: `Bearer ${token}` } }
+    )
+    return JSON.parse(JSON.stringify(data))
+})
+
 export const updateUser = actionClient.schema(updateUserSchema).action<ReturnActionType>(async ({ parsedInput }) => {
     try {
         const session = await getServerSession(authOptions)

@@ -7,6 +7,7 @@ const { default: mongoose } = require('mongoose')
 const errorMiddleware = require('./middlewares/error.middleware')
 const { rateLimit } = require('express-rate-limit')
 const stripeController = require('./controllers/stripe.controller')
+
 const app = express()
 
 // Webhook

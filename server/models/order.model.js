@@ -6,6 +6,7 @@ const orderSchema = new Schema(
         product: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
         price: { type: Number, required: true },
         status: { type: String, default: 'Pending confirm' },
+        provider: { type: String }
     },
     { timestamps: true }
 )

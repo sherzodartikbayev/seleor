@@ -1,6 +1,6 @@
 'use client'
 
-import { stripeCheckout } from '@/actions/user.action'
+import { clickCheckout, stripeCheckout } from '@/actions/user.action'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import useAction from '@/hooks/use-action'
@@ -24,6 +24,18 @@ const CreateOrderButton = () => {
         }
     }
 
+    const onClick = async () => {
+        setIsLoading(true)
+        const res = await clickCheckout({ id: productId })
+        if (res?.serverError || res?.validationErrors || !res?.data) {
+            return onError('Something went wrong')
+        }
+        if (res.data.failure) return onError(res.data.failure)
+        if (res.data.url) {
+            window.open(res.data.url, '_self')
+        }
+    }
+
     return (
         <Popover>
             <PopoverTrigger>
@@ -36,14 +48,14 @@ const CreateOrderButton = () => {
                     <Button variant={'secondary'} disabled={isLoading} onClick={onStripe}>
                         <Image src={'/stripe.svg'} alt='stripe' width={70} height={50} className='cursor-pointer' />
                     </Button>
-                    <Button variant={'secondary'} disabled={isLoading}>
-                        <Image src={'/click.svg'} alt='stripe' width={70} height={50} className='cursor-pointer' />
+                    <Button variant={'secondary'} disabled={isLoading} onClick={onClick}>
+                        <Image src={'/click.svg'} alt='click' width={70} height={50} className='cursor-pointer' />
                     </Button>
                     <Button variant={'secondary'} disabled={isLoading}>
-                        <Image src={'/payme.svg'} alt='stripe' width={70} height={50} className='cursor-pointer' />
+                        <Image src={'/payme.svg'} alt='payme' width={70} height={50} className='cursor-pointer' />
                     </Button>
                     <Button variant={'secondary'} disabled={isLoading}>
-                        <Image src={'/uzum.svg'} alt='stripe' width={70} height={50} className='cursor-pointer' />
+                        <Image src={'/uzum.svg'} alt='uzum' width={70} height={50} className='cursor-pointer' />
                     </Button>
                 </div>
             </PopoverContent>

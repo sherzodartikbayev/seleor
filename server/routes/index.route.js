@@ -6,5 +6,6 @@ router.use('/auth', require('./auth.route'))
 router.use('/otp', require('./otp.route'))
 router.use('/admin', adminMiddleware, require('./admin.route'))
 router.use('/user', require('./user.route'))
+router.use('/click', require('./click.route'))
 
 module.exports = router 

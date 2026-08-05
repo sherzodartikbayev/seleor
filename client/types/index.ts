@@ -23,6 +23,7 @@ export interface ReturnActionType {
 	orders: IOrder[]
 	transactions: ITransaction[]
 	statistics: { totalOrders: number; totalTransactions: number; totalFavourites: number }
+	url: string
 }
 
 export interface IProduct {
