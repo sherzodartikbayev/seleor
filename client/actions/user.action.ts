@@ -148,6 +148,30 @@ export const clickCheckout = actionClient.schema(idSchema).action<ReturnActionTy
     return JSON.parse(JSON.stringify(data))
 })
 
+export const paymeCheckout = actionClient.schema(idSchema).action<ReturnActionType>(async ({ parsedInput }) => {
+    const session = await getServerSession(authOptions)
+    if (!session) return { failure: "You need to be logged in to make a purchase" }
+    const token = await generateToken(session.currentUser?._id)
+    const { data } = await axiosClient.post(
+        '/api/payme/checkout',
+        { productId: parsedInput.id },
+        { headers: { Authorization: `Bearer ${token}` } }
+    )
+    return JSON.parse(JSON.stringify(data))
+})
+
+export const uzumCheckout = actionClient.schema(idSchema).action<ReturnActionType>(async ({ parsedInput }) => {
+    const session = await getServerSession(authOptions)
+    if (!session) return { failure: "You need to be logged in to make a purchase" }
+    const token = await generateToken(session.currentUser?._id)
+    const { data } = await axiosClient.post(
+        '/api/uzum/checkout',
+        { productId: parsedInput.id },
+        { headers: { Authorization: `Bearer ${token}` } }
+    )
+    return JSON.parse(JSON.stringify(data))
+})
+
 export const updateUser = actionClient.schema(updateUserSchema).action<ReturnActionType>(async ({ parsedInput }) => {
     try {
         const session = await getServerSession(authOptions)
