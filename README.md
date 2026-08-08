@@ -24,14 +24,7 @@ Here're some of the project's best features:
 ```
 git clone https://github.com/sherzodartikbayev/seleor.git
 ```
-
-<p>2. Frontend</p>
-
-```
-cd client && npm install && npm run dev
-```
-
-<p>3. Setup .env file to /client</p>
+<p>2. Setup .env file to /client</p>
 
 ```
 NEXT_PUBLIC_JWT_SECRET=
@@ -42,13 +35,13 @@ UPLOADTHING_TOKEN=
 UPLOADTHING_SECRET=
 ```
 
-<p>4. Backend</p>
+<p>3. Frontend</p>
 
 ```
-cd server && npm install && npm run dev
+cd client && npm install && npm run dev
 ```
 
-<p>5. Setup .env file to /server</p>
+<p>4. Setup .env file to /server</p>
 
 ```
 PORT=
@@ -78,6 +71,13 @@ UZUM_PASSWORD=
 UZUM_SERVICE_ID=
 ```
 
+<p>5. Backend</p>
+
+```
+cd server && npm install && npm run dev
+```
+
+
 <h2>💻 Built with</h2>
 Technologies used in the project:
 
@@ -90,8 +90,6 @@ Technologies used in the project:
 
 <h2>📸 Screenshots</h2>
 
-<img width="1902" height="960" alt="Screenshot_2026-08-08_04-06-59" src="https://github.com/user-attachments/assets/b7446924-83e8-4704-a472-e95dfc98a8fe" />
-<img width="1645" height="528" alt="Screenshot_2026-08-08_04-15-05" src="https://github.com/user-attachments/assets/47e8ba8a-7f05-401e-a664-6db803baa68f" />
 <img width="1912" height="933" alt="Screenshot_2026-08-08_14-53-45" src="https://github.com/user-attachments/assets/ff51cd07-1b04-48be-86b1-3a46c48659f1" />
 <img width="1912" height="933" alt="Screenshot_2026-08-08_14-54-15" src="https://github.com/user-attachments/assets/f20a69bb-0c03-4dba-a6d8-ac20feb1f680" />
 <img width="1912" height="933" alt="Screenshot_2026-08-08_14-54-29" src="https://github.com/user-attachments/assets/1a492b66-e9ba-4e7d-b264-3dc228dbaac9" />
