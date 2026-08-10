@@ -6,7 +6,7 @@
 
 <h2>🚀 Demo</h2>
 
-[https://www.seleor.web-pro.uz](https://www.seleor.web-pro.uz)
+[https://seleor.web-pro.uz](https://seleor.web-pro.uz)
 
 <h2>🧐 Features</h2>
 
